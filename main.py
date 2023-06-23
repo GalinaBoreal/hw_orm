@@ -1,30 +1,21 @@
-import os
-
 import sqlalchemy
-from sqlalchemy.orm import sessionmaker, joinedload
-import json
+from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
+import os
+from models import create_tables, delete_tables, Publisher, Book, Shop, Stock, Sale
+import json
+
 
 load_dotenv()
 
-from models import create_tables, delete_tables, Publisher, Book, Shop, Stock, Sale
 
 DSN = os.getenv('DSN')
 engine = sqlalchemy.create_engine(DSN)
 
-create_tables(engine)
-# delete_tables(engine)
 
-Session = sessionmaker(bind=engine)
-session = Session()
-
-session.close()
-
-
-def add_from_file(file):
-    with open(file, 'r') as fd:
+def add_from_file():
+    with open('insert_data.json', 'r') as fd:
         data = json.load(fd)
-
     for record in data:
         model = {
             'publisher': Publisher,
@@ -35,8 +26,29 @@ def add_from_file(file):
         }[record.get('model')]
         session.add(model(id=record.get('pk'), **record.get('fields')))
     session.commit()
+    return print('Таблицы заполнены')
 
-# add_from_file('insert_data.json')
 
-query = session.query(Book).join(Book.publisher).filter(Publisher.id == 1).all()
-print(query)
+def select_sale():
+    arg = str(input('Введите идентификатор или наименование издательства: '))
+    query = session.query(Publisher, Book, Stock, Shop, Sale)\
+        .join(Book, Book.id_publisher == Publisher.id)\
+        .join(Stock, Stock.id_book == Book.id).join(Shop, Shop.id == Stock.id_shop) \
+        .join(Sale, Sale.id_stock == Stock.id)
+    if arg.isnumeric():
+        records = query.filter(Publisher.id == arg).all()
+    else:
+        records = query.filter(Publisher.name == arg).all()
+    for b in records:
+        t, n, p, d = b.Book.title, b.Shop.name, b.Sale.price, b.Sale.date_sale.strftime("%d-%m-%Y")
+        print("%-40s %10s %10d %15s" % (t, n, p, d))
+        # print(f'{b.Book.title} | {b.Shop.name} | {b.Sale.price} | {(b.Sale.date_sale).strftime("%d-%m-%Y")}')
+
+
+Session = sessionmaker(bind=engine)
+
+with Session() as session:
+    # delete_tables(engine)
+    # create_tables(engine)
+    # add_from_file()
+    select_sale()
