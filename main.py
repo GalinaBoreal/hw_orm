@@ -31,10 +31,10 @@ def add_from_file():
 
 def select_sale():
     arg = str(input('Введите идентификатор или наименование издательства: '))
-    query = session.query(Publisher, Book, Stock, Shop, Sale)\
-        .join(Book, Book.id_publisher == Publisher.id)\
-        .join(Stock, Stock.id_book == Book.id).join(Shop, Shop.id == Stock.id_shop) \
-        .join(Sale, Sale.id_stock == Stock.id)
+    query = session.query(Publisher, Book, Stock, Shop, Sale).\
+        join(Book, Book.id_publisher == Publisher.id).\
+        join(Stock, Stock.id_book == Book.id).join(Shop, Shop.id == Stock.id_shop).\
+        join(Sale, Sale.id_stock == Stock.id)
     if arg.isnumeric():
         records = query.filter(Publisher.id == arg).all()
     else:
@@ -46,9 +46,8 @@ def select_sale():
 
 
 Session = sessionmaker(bind=engine)
-
 with Session() as session:
     # delete_tables(engine)
-    # create_tables(engine)
-    # add_from_file()
+    create_tables(engine)
+    add_from_file()
     select_sale()
