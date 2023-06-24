@@ -9,7 +9,7 @@ class Publisher(Base):
     __tablename__ = "publisher"
     __tableargs__ = {'comment': 'Издательство'}
 
-    id = sq.Column(sq.Integer, primary_key=True, nullable=False, autoincrement=True)
+    id = sq.Column(sq.Integer, primary_key=True)
     name = sq.Column(sq.String(length=40), nullable=False, unique=True)
 
     def __repr__(self):
@@ -20,7 +20,7 @@ class Book(Base):
     __tablename__ = "book"
     __tableargs__ = {'comment': 'Книга'}
 
-    id = sq.Column(sq.Integer, primary_key=True, nullable=False, autoincrement=True)
+    id = sq.Column(sq.Integer, primary_key=True)
     title = sq.Column(sq.String(length=40), nullable=False, unique=False)
     id_publisher = sq.Column(sq.Integer, sq.ForeignKey('publisher.id', ondelete='CASCADE'))
 
@@ -34,7 +34,7 @@ class Shop(Base):
     __tablename__ = "shop"
     __tableargs__ = {'comment': 'Магазин'}
 
-    id = sq.Column(sq.Integer, primary_key=True, nullable=False)
+    id = sq.Column(sq.Integer, primary_key=True)
     name = sq.Column(sq.String(length=40), unique=True)
 
     def __repr__(self):
@@ -75,9 +75,9 @@ class Sale(Base):
 
 def create_tables(engine):
     Base.metadata.create_all(engine)
-    return print('Таблицы созданы')
+    return 'Таблицы созданы'
 
 
 def delete_tables(engine):
     Base.metadata.drop_all(engine)
-    return print('Таблицы удалены')
+    return 'Таблицы удалены'

@@ -5,9 +5,7 @@ import os
 from models import create_tables, delete_tables, Publisher, Book, Shop, Stock, Sale
 import json
 
-
 load_dotenv()
-
 
 DSN = os.getenv('DSN')
 engine = sqlalchemy.create_engine(DSN)
@@ -26,14 +24,14 @@ def add_from_file():
         }[record.get('model')]
         session.add(model(id=record.get('pk'), **record.get('fields')))
     session.commit()
-    return print('Таблицы заполнены')
+    return 'Таблицы заполнены'
 
 
 def select_sale():
-    arg = str(input('Введите идентификатор или наименование издательства: '))
-    query = session.query(Publisher, Book, Stock, Shop, Sale).\
-        join(Book, Book.id_publisher == Publisher.id).\
-        join(Stock, Stock.id_book == Book.id).join(Shop, Shop.id == Stock.id_shop).\
+    arg = input('Введите идентификатор или наименование издательства: ')
+    query = session.query(Publisher, Book, Stock, Shop, Sale). \
+        join(Book, Book.id_publisher == Publisher.id). \
+        join(Stock, Stock.id_book == Book.id).join(Shop, Shop.id == Stock.id_shop). \
         join(Sale, Sale.id_stock == Stock.id)
     if arg.isnumeric():
         records = query.filter(Publisher.id == arg).all()
