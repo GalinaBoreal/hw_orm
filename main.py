@@ -1,9 +1,12 @@
-import sqlalchemy
-from sqlalchemy.orm import sessionmaker
+import json
 from dotenv import load_dotenv
 import os
+
+import sqlalchemy
+from sqlalchemy.orm import sessionmaker
+
 from models import create_tables, delete_tables, Publisher, Book, Shop, Stock, Sale
-import json
+
 
 load_dotenv()
 
@@ -44,8 +47,11 @@ def select_sale():
 
 
 Session = sessionmaker(bind=engine)
-with Session() as session:
-    # delete_tables(engine)
-    create_tables(engine)
-    add_from_file()
-    select_sale()
+
+if __name__=='__main__':
+
+    with Session() as session:
+        # delete_tables(engine)
+        # create_tables(engine)
+        # add_from_file()
+        select_sale()
